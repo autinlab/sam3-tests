@@ -139,6 +139,18 @@ def add_pythonpath_to_sys_path():
 
 def main(args) -> None:
     cfg = compose(config_name=args.config)
+
+    if args.data_root is not None:
+        cfg.paths.data_root = args.data_root
+    if args.annotations_name is not None:
+        cfg.paths.annotations_name = args.annotations_name
+    if args.experiment_log_dir is not None:
+        cfg.paths.experiment_log_dir = args.experiment_log_dir
+    if args.checkpoint_path is not None:
+        cfg.paths.checkpoint_path = args.checkpoint_path
+    if args.bpe_path is not None:
+        cfg.paths.bpe_path = args.bpe_path
+
     if cfg.launcher.experiment_log_dir is None:
         cfg.launcher.experiment_log_dir = os.path.join(
             os.getcwd(), "sam3_logs", args.config
@@ -312,6 +324,7 @@ def main(args) -> None:
 if __name__ == "__main__":
     initialize_config_module("sam3.train", version_base="1.2")
     parser = ArgumentParser()
+
     parser.add_argument(
         "-c",
         "--config",
@@ -319,6 +332,7 @@ if __name__ == "__main__":
         type=str,
         help="path to config file (e.g. configs/roboflow_v100_full_ft_100_images.yaml)",
     )
+
     parser.add_argument(
         "--use-cluster",
         type=int,
@@ -328,11 +342,42 @@ if __name__ == "__main__":
     parser.add_argument("--partition", type=str, default=None, help="SLURM partition")
     parser.add_argument("--account", type=str, default=None, help="SLURM account")
     parser.add_argument("--qos", type=str, default=None, help="SLURM qos")
-    parser.add_argument(
-        "--num-gpus", type=int, default=None, help="number of GPUS per node"
-    )
+    parser.add_argument("--num-gpus", type=int, default=None, help="number of GPUS per node")
     parser.add_argument("--num-nodes", type=int, default=None, help="Number of nodes")
+
+    parser.add_argument(
+        "--data-root",
+        type=str,
+        default=None,
+        help="override paths.data_root",
+    )
+    parser.add_argument(
+        "--annotations-name",
+        type=str,
+        default=None,
+        help="override paths.annotations_name",
+    )
+    parser.add_argument(
+        "--experiment-log-dir",
+        type=str,
+        default=None,
+        help="override paths.experiment_log_dir",
+    )
+    parser.add_argument(
+        "--checkpoint-path",
+        type=str,
+        default=None,
+        help="override paths.checkpoint_path",
+    )
+    parser.add_argument(
+        "--bpe-path",
+        type=str,
+        default=None,
+        help="override paths.bpe_path",
+    )
+
     args = parser.parse_args()
     args.use_cluster = bool(args.use_cluster) if args.use_cluster is not None else None
+
     register_omegaconf_resolvers()
     main(args)

@@ -145,7 +145,7 @@ scratch:
   # Matcher configuration
   matcher:
     _target_: sam3.train.matcher.BinaryHungarianMatcherV2 # Hungarian one-to-one matcher using class/box/GIoU costs.
-    focal: false  # with `focal: true` it is equivalent to BinaryFocalHungarianMatcher
+    focal: true  # with `focal: true` it is equivalent to BinaryFocalHungarianMatcher
     cost_class: 2.0
     cost_bbox: 5.0
     cost_giou: 2.0
@@ -409,7 +409,7 @@ submitit:
 # ============================================================================
 
 all_supercategories:
-  - capsid
+  - fill
 
 # trainer.optim.amp.enabled=false
 # scratch.matcher.focal=false

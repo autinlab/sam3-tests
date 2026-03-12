@@ -137,6 +137,13 @@ def add_pythonpath_to_sys_path():
     sys.path = os.environ["PYTHONPATH"].split(":") + sys.path
 
 
+def parse_comma_separated_arg(raw_value: str):
+    values = [value.strip() for value in raw_value.split(",") if value.strip()]
+    if not values:
+        raise ValueError("Expected at least one non-empty value in comma-separated override")
+    return values
+
+
 def main(args) -> None:
     cfg = compose(config_name=args.config)
 
@@ -150,6 +157,8 @@ def main(args) -> None:
         cfg.paths.checkpoint_path = args.checkpoint_path
     if args.bpe_path is not None:
         cfg.paths.bpe_path = args.bpe_path
+    if args.all_supercategories is not None:
+        cfg.all_supercategories = parse_comma_separated_arg(args.all_supercategories)
 
     if cfg.launcher.experiment_log_dir is None:
         cfg.launcher.experiment_log_dir = os.path.join(
@@ -374,6 +383,12 @@ if __name__ == "__main__":
         type=str,
         default=None,
         help="override paths.bpe_path",
+    )
+    parser.add_argument(
+        "--all-supercategories",
+        type=str,
+        default=None,
+        help="override all_supercategories with a comma-separated list",
     )
 
     args = parser.parse_args()

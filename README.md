@@ -1,3 +1,23 @@
+# SAM3 Tests
+
+This repo is an experimental fork for capsid-specific customization of the SAM3 model.
+
+## Boundary
+
+- Keep model-level changes here: training configs, prompting internals, architecture tweaks, checkpoint behavior, and feasibility experiments.
+- Do not keep maintained capsid workflow glue here; that belongs in `sam-capsids`.
+- Do not use this repo as the default home for learned baselines or benchmark ownership; that belongs in `capsid-learning`.
+
+## Promotion Rule
+
+- If an experiment changes how SAM itself should behave, it can remain here.
+- If an experiment stabilizes into a reusable capsid workflow, promote the workflow code to `sam-capsids`.
+- If an experiment becomes a benchmarked method comparison or learned downstream model, move that work to `capsid-learning`.
+
+## Upstream Base
+
+This repository still tracks the upstream SAM3 codebase and should stay close to that structure so local customizations remain explicit.
+
 # SAM 3: Segment Anything with Concepts
 
 Meta Superintelligence Labs

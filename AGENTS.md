@@ -13,7 +13,6 @@ This repo is a lightweight sandbox for upstream SAM3 experimentation and feasibi
 ## Out Of Scope
 
 - long-term maintained workflow code that belongs in `sam-capsids`
-- hub-level planning
 - benchmark ownership that belongs in `capsid-learning`
 
 ## Local Constraints

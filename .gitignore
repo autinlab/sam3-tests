@@ -1,3 +1,6 @@
+# Relative to project
+.codex
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

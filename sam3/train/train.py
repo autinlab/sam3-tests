@@ -147,6 +147,12 @@ def parse_comma_separated_arg(raw_value: str):
 def main(args) -> None:
     cfg = compose(config_name=args.config)
 
+    if args.supercategory is not None and args.all_supercategories is not None:
+        raise ValueError(
+            "Use either --supercategory (single value) or --all-supercategories "
+            "(comma-separated list), not both"
+        )
+
     if args.data_root is not None:
         cfg.paths.data_root = args.data_root
     if args.annotations_name is not None:
@@ -157,7 +163,9 @@ def main(args) -> None:
         cfg.paths.checkpoint_path = args.checkpoint_path
     if args.bpe_path is not None:
         cfg.paths.bpe_path = args.bpe_path
-    if args.all_supercategories is not None:
+    if args.supercategory is not None:
+        cfg.all_supercategories = [args.supercategory]
+    elif args.all_supercategories is not None:
         cfg.all_supercategories = parse_comma_separated_arg(args.all_supercategories)
 
     if cfg.launcher.experiment_log_dir is None:
@@ -200,6 +208,38 @@ def main(args) -> None:
     submitit_conf.use_cluster = (
         args.use_cluster if args.use_cluster is not None else submitit_conf.use_cluster
     )
+
+    job_array_conf = submitit_conf.get("job_array", None)
+    job_array_num_tasks = (
+        job_array_conf.get("num_tasks", -1) if job_array_conf is not None else -1
+    )
+
+    if args.all_supercategories is not None:
+        if len(cfg.all_supercategories) < 2:
+            raise ValueError(
+                "--all-supercategories requires at least 2 comma-separated values. "
+                "Use --supercategory for a single category"
+            )
+        if not submitit_conf.use_cluster:
+            raise ValueError(
+                "--all-supercategories is intended for cluster sweeps. "
+                "Use --use-cluster 1 and submitit.job_array.num_tasks > 1, "
+                "or use --supercategory for local runs"
+            )
+        if job_array_num_tasks <= 1:
+            raise ValueError(
+                "--all-supercategories requires submitit.job_array.num_tasks > 1 "
+                "to run a multi-category sweep"
+            )
+
+    if job_array_num_tasks > 0 and len(cfg.all_supercategories) < job_array_num_tasks:
+        raise ValueError(
+            "submitit.job_array.num_tasks ({}) exceeds all_supercategories length ({}). "
+            "Reduce num_tasks or provide enough categories".format(
+                job_array_num_tasks, len(cfg.all_supercategories)
+            )
+        )
+
     if submitit_conf.use_cluster:
         executor = submitit.AutoExecutor(folder=submitit_dir)
         submitit_conf.partition = (
@@ -385,10 +425,19 @@ if __name__ == "__main__":
         help="override paths.bpe_path",
     )
     parser.add_argument(
+        "--supercategory",
+        type=str,
+        default=None,
+        help="override with a single supercategory (maps to all_supercategories=[value])",
+    )
+    parser.add_argument(
         "--all-supercategories",
         type=str,
         default=None,
-        help="override all_supercategories with a comma-separated list",
+        help=(
+            "override all_supercategories with a comma-separated list "
+            "(cluster sweeps/job arrays only)"
+        ),
     )
 
     args = parser.parse_args()

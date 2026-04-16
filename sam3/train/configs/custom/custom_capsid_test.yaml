@@ -297,7 +297,7 @@ trainer:
       custom:
         detection:
           _target_: sam3.eval.coco_writer.PredictionDumper # Postprocess outputs and dump COCO predictions.
-          iou_type: "bbox"
+          iou_type: "segm"
           dump_dir: ${launcher.experiment_log_dir}/dumps/custom/${custom_train.supercategory}
           merge_predictions: true
           postprocessor: ${scratch.original_box_postprocessor}
@@ -410,10 +410,3 @@ submitit:
 
 all_supercategories:
   - fill
-
-# trainer.optim.amp.enabled=false
-# scratch.matcher.focal=false
-# scratch.lr_scale=0.03 (then 0.02 if needed)
-# trainer.optim.gradient_clip.max_norm=0.05
-# scratch.max_ann_per_img=100
-# scratch.train_batch_size=2

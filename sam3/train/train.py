@@ -232,14 +232,6 @@ def main(args) -> None:
                 "to run a multi-category sweep"
             )
 
-    if job_array_num_tasks > 0 and len(cfg.all_supercategories) < job_array_num_tasks:
-        raise ValueError(
-            "submitit.job_array.num_tasks ({}) exceeds all_supercategories length ({}). "
-            "Reduce num_tasks or provide enough categories".format(
-                job_array_num_tasks, len(cfg.all_supercategories)
-            )
-        )
-
     if submitit_conf.use_cluster:
         executor = submitit.AutoExecutor(folder=submitit_dir)
         submitit_conf.partition = (

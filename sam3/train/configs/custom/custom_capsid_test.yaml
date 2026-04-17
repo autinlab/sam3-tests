@@ -3,8 +3,9 @@ defaults:
   - _self_
 
 # ============================================================================
-# CUDA_VISIBLE_DEVICES=1 python sam3/train/train.py -c configs/custom/custom_capsid_test.yaml
+# python sam3/train/train.py -c configs/custom/custom_capsid_test.yaml --data-root /mnt/forli/group/qtallon/sam/coco/capsid_data_dir/ --experiment-log-dir /mnt/forli/group/qtallon/sam/logs/capsid_log_dir/ --supercategory supercategory_name
 # ============================================================================
+
 paths:
   data_root: data
   annotations_name: coco_annotations.json
@@ -122,6 +123,7 @@ custom_train:
 # ============================================================================
 # Different helper parameters and functions
 # ============================================================================
+
 scratch:
   enable_segmentation: true
   # Model parameters

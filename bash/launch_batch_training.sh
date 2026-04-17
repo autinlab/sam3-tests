@@ -27,13 +27,11 @@ run_one() {
     --supercategory "${supercategory}"
 }
 
-run_one "capsid_default_dozen_0neg" "fill" "capsid_default_fill_dozen_0neg_logs"
 run_one "capsid_default_dozen_5neg" "fill" "capsid_default_fill_dozen_5neg_logs"
 run_one "capsid_default_dozen_10neg" "fill" "capsid_default_fill_dozen_10neg_logs"
 run_one "capsid_default_fifty_5neg" "fill" "capsid_default_fill_fifty_5neg_logs"
 run_one "capsid_default_hundred_5neg" "fill" "capsid_default_fill_hundred_5neg_logs"
 
-run_one "capsid_default_dozen_0neg" "semantic__semantic:shell" "capsid_default_shell_dozen_0neg_logs"
 run_one "capsid_default_dozen_5neg" "semantic__semantic:shell" "capsid_default_shell_dozen_5neg_logs"
 run_one "capsid_default_dozen_10neg" "semantic__semantic:shell" "capsid_default_shell_dozen_10neg_logs"
 run_one "capsid_default_fifty_5neg" "semantic__semantic:shell" "capsid_default_shell_fifty_5neg_logs"

@@ -9,7 +9,7 @@ set -euo pipefail
 # Examples:
 #   ./bash/launch_batch_training.sh
 #   DATASET_PREFIX=capsid_salk_noisy LOG_PREFIX=capsid_salk_noisy ./bash/launch_batch_training.sh
-#   DATASET_SPECS='dozen_5neg,dozen_10neg' TARGETS='fill,shell' ./bash/launch_batch_training.sh
+#   DATASET_SPECS='dozen_0neg,dozen_5neg' TARGETS='fill,shell' ./bash/launch_batch_training.sh
 
 CONFIG="${CONFIG:-configs/custom/custom_capsid_test.yaml}"
 DATA_ROOT_BASE="${DATA_ROOT_BASE:-/mnt/forli/group/qtallon/sam/coco}"
@@ -18,7 +18,7 @@ DATASET_PREFIX="${DATASET_PREFIX:-capsid_default}"
 LOG_PREFIX="${LOG_PREFIX:-${DATASET_PREFIX}}"
 SHELL_LABEL="${SHELL_LABEL:-shell}"
 SHELL_SUPERCATEGORY="${SHELL_SUPERCATEGORY:-semantic__semantic:${SHELL_LABEL}}"
-DATASET_SPECS="${DATASET_SPECS:-dozen_5neg,dozen_10neg,fifty_5neg,hundred_5neg}"
+DATASET_SPECS="${DATASET_SPECS:-dozen_0neg,dozen_5neg,dozen_10neg,fifty_5neg,hundred_5neg}"
 TARGETS="${TARGETS:-fill,shell}"
 PYTHON_BIN="${PYTHON_BIN:-python}"
 
@@ -34,13 +34,13 @@ Environment variables:
   LOG_PREFIX          Log name prefix, defaults to DATASET_PREFIX
   SHELL_LABEL         Single-class semantic label used in log names
   SHELL_SUPERCATEGORY Semantic supercategory passed to train.py
-  DATASET_SPECS       Comma-separated dataset suffixes, e.g. dozen_5neg,fifty_5neg
+  DATASET_SPECS       Comma-separated dataset suffixes, e.g. dozen_0neg,dozen_5neg
   TARGETS             Comma-separated targets: fill,shell
   PYTHON_BIN          Python executable to use
 
 Examples:
   DATASET_PREFIX=capsid_salk_noisy LOG_PREFIX=capsid_salk_noisy ./bash/launch_batch_training.sh
-  DATASET_SPECS='dozen_5neg,dozen_10neg' TARGETS='shell' ./bash/launch_batch_training.sh
+  DATASET_SPECS='dozen_0neg,dozen_5neg' TARGETS='shell' ./bash/launch_batch_training.sh
 EOF
 }
 

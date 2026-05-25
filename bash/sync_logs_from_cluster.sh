@@ -97,6 +97,8 @@ if ! command -v rsync >/dev/null 2>&1; then
 fi
 
 SSH_SOCKET="$(mktemp -u /tmp/ssh-ctrl-XXXXXX)"
+RUN_LIST="$(mktemp /tmp/sam-log-runs-XXXXXX)"
+DRY_OUTPUT_FILE="$(mktemp /tmp/sam-log-rsync-dry-XXXXXX)"
 SSH_MASTER_OPTS=(
 	-o ControlMaster=yes
 	-o ControlPath="$SSH_SOCKET"
@@ -104,7 +106,7 @@ SSH_MASTER_OPTS=(
 	-p "$PORT"
 )
 SSH_REUSE_OPTS=(
-	-o ControlMaster=no
+	-o ControlMaster=auto
 	-o ControlPath="$SSH_SOCKET"
 	-p "$PORT"
 )
@@ -113,7 +115,11 @@ ssh "${SSH_MASTER_OPTS[@]}" -fN "$REMOTE"
 SSH_CMD=(ssh "${SSH_REUSE_OPTS[@]}")
 RSYNC_SSH="ssh ${SSH_REUSE_OPTS[*]}"
 
-trap 'ssh -o ControlPath="$SSH_SOCKET" -O exit "$REMOTE" 2>/dev/null || true' EXIT
+cleanup() {
+	ssh -o ControlPath="$SSH_SOCKET" -O exit "$REMOTE" 2>/dev/null || true
+	rm -f "$RUN_LIST" "$DRY_OUTPUT_FILE"
+}
+trap cleanup EXIT
 
 if ! "${SSH_CMD[@]}" "$REMOTE" "test -d '$REMOTE_DIR'"; then
 	echo "Error: remote directory does not exist: $REMOTE_DIR" >&2
@@ -166,20 +172,29 @@ if [[ -z "$RUN_DIRS" ]]; then
 	exit 1
 fi
 
+printf '%s\n' "$RUN_DIRS" | sed 's|$|/|' > "$RUN_LIST"
+
+echo "Checking which referenced run directories have missing local files..."
+rsync -a -r --ignore-existing --itemize-changes --human-readable --dry-run \
+	--out-format='%i %n%L' \
+	--files-from="$RUN_LIST" \
+	-e "$RSYNC_SSH" \
+	"$REMOTE:$REMOTE_DIR/" "$LOCAL_DIR/" > "$DRY_OUTPUT_FILE"
+
+AFFECTED_RUN_DIRS="$(
+	awk '
+		$1 ~ /\+/ || $1 ~ /^[>chLS]/ {
+			path=$2
+			sub(/\/.*/, "", path)
+			if (path != "") {
+				print path
+			}
+		}
+	' "$DRY_OUTPUT_FILE" |
+		sort -u
+)"
+
 if [[ "$DRY_RUN" == "true" ]]; then
-	AFFECTED_RUN_DIRS=""
-	while IFS= read -r run_dir; do
-		[[ -z "$run_dir" ]] && continue
-		src="$REMOTE_DIR/$run_dir/"
-		dst="$LOCAL_DIR/$run_dir/"
-		DRY_OUTPUT="$(rsync -a --ignore-existing --itemize-changes --human-readable --dry-run -e "$RSYNC_SSH" "$REMOTE:$src" "$dst")"
-		if printf '%s\n' "$DRY_OUTPUT" | grep -Eq '^[^[:space:]]*\+{9}[[:space:]]|^created directory[[:space:]]'; then
-			AFFECTED_RUN_DIRS+="$run_dir"$'\n'
-		fi
-	done <<< "$RUN_DIRS"
-
-	AFFECTED_RUN_DIRS="$(printf '%s' "$AFFECTED_RUN_DIRS" | sed '/^$/d' | sort -u)"
-
 	if [[ -n "$AFFECTED_RUN_DIRS" ]]; then
 		echo "Directories that would be affected:"
 		printf '%s\n' "$AFFECTED_RUN_DIRS"
@@ -191,8 +206,15 @@ if [[ "$DRY_RUN" == "true" ]]; then
 	exit 0
 fi
 
-echo "Run directories referenced by logs:"
-printf '%s\n' "$RUN_DIRS"
+if [[ -z "$AFFECTED_RUN_DIRS" ]]; then
+	echo "All referenced run directories already have their remote files locally."
+	exit 0
+fi
+
+printf '%s\n' "$AFFECTED_RUN_DIRS" | sed 's|$|/|' > "$RUN_LIST"
+
+echo "Run directories with missing local files:"
+printf '%s\n' "$AFFECTED_RUN_DIRS"
 
 if [[ "$ASSUME_YES" != "true" ]]; then
 	read -r -p "Proceed with syncing these directories to $LOCAL_DIR? [y/N] " reply
@@ -202,12 +224,9 @@ if [[ "$ASSUME_YES" != "true" ]]; then
 	fi
 fi
 
-while IFS= read -r run_dir; do
-	[[ -z "$run_dir" ]] && continue
-	src="$REMOTE_DIR/$run_dir/"
-	dst="$LOCAL_DIR/$run_dir/"
-	echo "Syncing: $run_dir"
-	rsync -a --ignore-existing --itemize-changes --human-readable -e "$RSYNC_SSH" "$REMOTE:$src" "$dst"
-done <<< "$RUN_DIRS"
+rsync -a -r --ignore-existing --itemize-changes --human-readable \
+	--files-from="$RUN_LIST" \
+	-e "$RSYNC_SSH" \
+	"$REMOTE:$REMOTE_DIR/" "$LOCAL_DIR/"
 
 echo "Sync complete."

@@ -32,7 +32,7 @@ Validation should end in a clear disposition:
 - keep sandbox-only
 - discard
 
-## Hub Relationship
+## Control Plane Relationship
 
-The hub decides when a sandbox result matters.
+RootRoute (`/home/qtallon/Documents/code/scripps-root-route`) decides when a sandbox result matters.
 This repo only supports the experimental execution.

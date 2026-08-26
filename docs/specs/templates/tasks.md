@@ -4,4 +4,4 @@
 - [ ] implement the experiment
 - [ ] validate the result
 - [ ] record promote / keep / discard decision
-- [ ] write the meaningful checkpoint back into the RootRoute item
+- [ ] if the work came from `scripps-rr`, write the meaningful checkpoint back into that item

@@ -34,5 +34,5 @@ Validation should end in a clear disposition:
 
 ## Control Plane Relationship
 
-RootRoute (`/home/qtallon/Documents/code/scripps-root-route`) decides when a sandbox result matters.
-This repo only supports the experimental execution.
+If the work came from `scripps-rr`, that repo decides when a sandbox result matters and this repo
+only supports the experimental execution. If it is a local need, this file is the whole contract.

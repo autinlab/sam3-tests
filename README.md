@@ -83,18 +83,23 @@ This breakthrough is driven by an innovative data engine that has automatically 
 - PyTorch 2.7 or higher
 - CUDA-compatible GPU with CUDA 12.6 or higher
 
-1. **Create a new Conda environment:**
+1. **On mickey, the environment already exists and is `sam` — not `sam3`.**
 
 ```bash
-conda create -n sam3 python=3.12
-conda deactivate
-conda activate sam3
+micromamba run -n sam python3 -c "import sam3; print(sam3.__file__)"
 ```
 
-2. **Install PyTorch with CUDA support:**
+`sam` resolves the vendored `sam3/` package in this repo and has every import these scripts need.
+`sam-dev` does **not** — it is missing `decord`. There is no `sam3` environment and `conda` is not
+installed on this machine at all; the block below is the upstream instruction, kept for a fresh
+machine only. Corrected 2026-08-28, when the old text still said `conda activate sam3`.
+
+2. **On a fresh machine, from scratch:**
 
 ```bash
-pip install torch==2.7.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu126
+micromamba create -n sam3 python=3.12
+micromamba run -n sam3 pip install torch==2.7.0 torchvision torchaudio \
+  --index-url https://download.pytorch.org/whl/cu126
 ```
 
 3. **Clone the repository and install the package:**

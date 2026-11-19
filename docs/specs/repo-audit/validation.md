@@ -1,6 +1,6 @@
 # Repo audit — 2026-08-28
 
-Written by a `/root-route` crossing from `scripps-rr`, which read **every file in this repo** —
+Written by a crossing from the control plane, which read **every file in this repo** —
 syntax, imports, configs, markdown links, and every path referenced by anything. This is the record
 of what was checked so the next person does not repeat it.
 

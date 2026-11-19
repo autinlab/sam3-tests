@@ -34,5 +34,5 @@ Validation should end in a clear disposition:
 
 ## Control Plane Relationship
 
-If the work came from `scripps-rr`, that repo decides when a sandbox result matters and this repo
+If the work came from the control plane, that repo decides when a sandbox result matters and this repo
 only supports the experimental execution. If it is a local need, this file is the whole contract.

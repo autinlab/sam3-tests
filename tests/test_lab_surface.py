@@ -47,7 +47,7 @@ def test_script_help_exits_cleanly_and_says_something(script):
 def test_sync_logs_pulls_to_the_recorded_bigdata_location():
     """`LOCAL_DIR` must stay `/media/qtallon/BIGDATA/sam/logs`.
 
-    That path is what `scripps-rr`'s `GOVERNANCE/places.md` records as the home of the 22 SAM
+    That path is what the control plane's `GOVERNANCE/places.md` records as the home of the 22 SAM
     fine-tuning runs, and what `sam-capsids/configs/sam_training_runs.yaml` names as its
     `sam_log_root`. Three files, one path; this pins the one that would silently pull elsewhere.
     """
